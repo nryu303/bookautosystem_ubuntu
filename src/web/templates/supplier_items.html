@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}{{ supplier.supplier_name }} 保留商品 - BookAutoSystem{% endblock %}
+{% block content %}
+<div class="d-flex align-items-center mb-3">
+    <a href="/suppliers" class="btn btn-sm btn-outline-secondary me-3">&larr; 仕入台帳</a>
+    <h4 class="mb-0">{{ supplier.supplier_name }} <span class="text-muted fw-normal" style="font-size:.85rem">保留商品一覧</span></h4>
+</div>
+
+<!-- サマリー -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="stat-card" style="border-left:3px solid var(--color-brand)">
+            保留合計金額<strong>{{ '{:,}'.format(bucket.total_amount or 0) }}円</strong>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card" style="border-left:3px solid #ea580c">
+            保留件数<strong>{{ bucket.item_count or 0 }}件</strong>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card" style="border-left:3px solid #64748b">
+            保留上限金額<strong>{{ '{:,}'.format(supplier.hold_limit_amount or 0) }}円</strong>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card" style="border-left:3px solid
+            {% if bucket.status == 'THRESHOLD_REACHED' %}#f59e0b{% elif bucket.status == 'CLEARED' %}#16a34a{% else %}#94a3b8{% endif %}">
+            ステータス<strong>{{ bucket_label(bucket.status) }}</strong>
+        </div>
+    </div>
+</div>
+
+<!-- 発注確定ボタン（閾値到達時のみ表示） -->
+{% if bucket.status == 'THRESHOLD_REACHED' and items %}
+<div class="card mb-4 border-warning">
+    <div class="card-body d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between py-3" style="background:#fef9c3">
+        <div class="mb-2 mb-sm-0">
+            <strong class="text-warning">閾値到達</strong> —
+            電話発注が完了したら「発注確定」を押してください。
+            <br><small class="text-muted">バケット内の全{{ items|length }}件が「発注確定」に変更されます。</small>
+        </div>
+        <form method="POST" action="/supplier/{{ supplier.id }}/confirm" onsubmit="return confirm('{{ supplier.supplier_name }} の {{ items|length }}件を発注確定しますか？')">
+            <button type="submit" class="btn btn-warning fw-semibold">発注確定</button>
+        </form>
+    </div>
+</div>
+{% endif %}
+
+<!-- 保留商品テーブル -->
+{% if items %}
+<div class="table-responsive">
+<table class="table table-bordered table-hover table-sm">
+    <thead class="table-primary">
+        <tr>
+            <th>No.</th>
+            <th>受注日</th>
+            <th>管理番号</th>
+            <th>商品名</th>
+            <th>商品コード</th>
+            <th>金額</th>
+            <th>数量</th>
+            <th>保留登録日</th>
+            <th>状態</th>
+            <th>詳細</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in items %}
+        <tr>
+            <td class="text-center">{{ loop.index }}</td>
+            <td>{{ item.received_at or '-' }}</td>
+            <td><code>{{ item.order_number or '-' }}</code></td>
+            <td>{{ item.product_name or '-' }}</td>
+            <td><code>{{ item.product_code_normalized or '-' }}</code></td>
+            <td class="text-end">{{ '{:,}'.format(item.amount or 0) }}円</td>
+            <td class="text-center">{{ item.quantity or 1 }}</td>
+            <td>{{ item.assigned_at or '-' }}</td>
+            <td class="status-{{ item.current_status }}"><strong>{{ order_label(item.current_status) }}</strong></td>
+            <td class="text-center"><a href="/item/{{ item.order_item_id }}" class="btn btn-sm btn-outline-primary">詳細</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+{% else %}
+<div class="card">
+    <div class="card-body text-center text-muted py-4">
+        保留中の商品はありません
+    </div>
+</div>
+{% endif %}
+{% endblock %}

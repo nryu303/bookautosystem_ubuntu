@@ -1,0 +1,45 @@
+outlook:
+  account_name: "zeushera00001@gmail.com"
+  folder_name: "INBOX"
+  polling_interval_sec: 1800
+  mode: "imap"                  # "com"（クラシックOutlook）/ "graph"（Graph API）/ "imap"（IMAP方式）
+  graph_client_id: ""          # Azure ADアプリのクライアントID（mode=graph時に必須）
+  graph_tenant_id: "consumers" # "consumers"（個人アカウント）or Azure ADテナントID
+  imap_password: "opzafycrfiwtmrpp" # IMAPログイン用パスワード（mode=imap時に必須）
+  imap_host: ""                # IMAPサーバー（空欄ならメールアドレスから自動検出）
+  imap_port: 993               # IMAPポート（通常993）
+
+database:
+  path: "data/db/main.db"
+
+storage:
+  screenshots: "data/screenshots"
+  html_snapshots: "data/html_snapshots"
+  csv_dir: "data/csv"
+  output_dir: "data/output"
+
+self_stock:
+  csv_path: "data/csv/self_stock.xlsx"
+
+url_csv:
+  csv_path: "data/csv/url_specified.xlsx"
+
+scraping:
+  timeout_sec: 30
+  headless: true
+  max_retries: 2
+
+hold:
+  strategy: "fill_smallest"  # fill_smallest or fill_largest
+
+mail:
+  confirmation_mode: false
+  max_send_per_run: 10
+
+web:
+  host: "0.0.0.0"
+  port: 5000
+
+logging:
+  level: "INFO"
+  dir: "logs"

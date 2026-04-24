@@ -1,0 +1,968 @@
+suppliers:
+- code: X000001
+  name: ヨドバシカメラ
+  category: ec
+  scrape_enabled: true
+  auto_mail_enabled: true
+  priority: 1
+  hold_limit_amount: 7000
+  hold_limit_days: 14
+  mail_limit_amount: 0
+  mail_limit_days: 0
+  mail_unit_price_limit: 0
+  mail_quantity_limit: 0
+  mail_to_address: ''
+  login_required: false
+  positive_patterns:
+  - 在庫あり
+  negative_patterns:
+  - お取り寄せ
+  - 販売休止中です
+  url_mode: template
+  url_template: https://www.yodobashi.com/?word={code}
+  lookup_csv_path: ''
+- code: X000002
+  name: 楽天ブックス
+  category: ec
+  scrape_enabled: true
+  auto_mail_enabled: false
+  priority: 2
+  hold_limit_amount: 4000
+  hold_limit_days: 14
+  mail_limit_amount: 0
+  mail_limit_days: 0
+  mail_unit_price_limit: 0
+  mail_quantity_limit: 0
+  mail_to_address: ''
+  login_required: false
+  positive_patterns:
+  - 在庫あり
+  negative_patterns:
+  - 取り寄せ
+  - 予約受付中
+  - ご注文できない商品
+  url_mode: template
+  url_template: https://books.rakuten.co.jp/search?sitem={code}
+  lookup_csv_path: ''
+- code: X000003
+  name: 紀伊国屋書店
+  category: ec
+  scrape_enabled: true
+  auto_mail_enabled: false
+  priority: 3
+  hold_limit_amount: 4000
+  hold_limit_days: 14
+  mail_limit_amount: 0
+  mail_limit_days: 0
+  mail_unit_price_limit: 0
+  mail_quantity_limit: 0
+  mail_to_address: ''
+  login_required: false
+  positive_patterns:
+  - カートに入れる
+  - ウェブストア専用在庫あり
+  - 提携先に在庫あり
+  - 在庫僅少
+  - ウェブストアに
+  negative_patterns:
+  - ただいまウェブストアではご注文を受け付けておりません
+  - ご注文いただけません
+  - ご予約受付中（分納になります）
+  - ウェブストアでは予約受け付けを終了しました
+  - お取り寄せ
+  - 該当する結果がありません
+  url_mode: template
+  url_template: https://www.kinokuniya.co.jp/f/dsg-01-{code}
+  lookup_csv_path: ''
+- code: X000004
+  name: e-hon
+  category: ec
+  scrape_enabled: false
+  auto_mail_enabled: false
+  priority: 4
+  hold_limit_amount: 10000
+  hold_limit_days: 14
+  mail_limit_amount: 0
+  mail_limit_days: 0
+  mail_unit_price_limit: 0
+  mail_quantity_limit: 0
+  mail_to_address: ''
+  login_required: false
+  positive_patterns:
+  - 通常１～２日で出荷
+  - メーカーより取寄せ
+  negative_patterns:
+  - 絶版商品です
+  - 現在ご注文できません
+  url_mode: template
+  url_template: https://www.e-hon.ne.jp/bec/SA/ListAll?cnt=13&pageNumber=0&mode=speed&spKeyword={code}
+  lookup_csv_path: ''
+- code: X000005
+  name: 日本の古本屋
+  category: ec
+  scrape_enabled: true
+  auto_mail_enabled: false
+  priority: 5
+  hold_limit_amount: 10000
+  hold_limit_days: 14
+  mail_limit_amount: 0
+  mail_limit_days: 0
+  mail_unit_price_limit: 0
+  mail_quantity_limit: 0
+  mail_to_address: ''
+  login_required: false
+  positive_patterns: []
+  negative_patterns:
+  - ご指定の商品は見つかりませんでした
+  - 該当する商品がありません
+  url_mode: url_csv_db
+  url_template: https://www.kosho.or.jp/products/detail.php?product_id={code}
+  lookup_csv_path: data/csv/furuhonya_urls.csv
+- code: X000007
+  name: 丸善ジュンク堂書店-web
+  category: ec
+  scrape_enabled: true
+  auto_mail_enabled: false
+  priority: 5
+  hold_limit_amount: 10000
+  hold_limit_days: 14
+  mail_limit_amount: 0
+  mail_limit_days: 0
+  mail_unit_price_limit: 0
+  mail_quantity_limit: 0
+  mail_to_address: ''
+  login_required: false
+  positive_patterns:
+  - 在庫あり
+  - 提携倉庫在庫あり
+  negative_patterns:
+  - ご予約
+  - お取り扱いできません
+  url_mode: template
+  url_template: https://www.maruzenjunkudo.co.jp/products/{code}
+  lookup_csv_path: ''
+- code: X000008
+  name: 丸善ジュンク堂書店-札幌店
+  category: store
+  scrape_enabled: true
+  auto_mail_enabled: true
+  priority: 6
+  hold_limit_amount: 10000
+  hold_limit_days: 7
+  mail_limit_amount: 10000
+  mail_limit_days: 3
+  mail_unit_price_limit: 0
+  mail_quantity_limit: 0
+  mail_to_address: ''
+  login_required: false
+  positive_patterns:
+  - 在庫〇
+  - 在庫△
+  - 在庫○
+  negative_patterns:
+  - 在庫✕
+  - 在庫×
+  url_mode: template
+  url_template: https://www.maruzenjunkudo.co.jp/pages/shoplist?product={code}
+  lookup_csv_path: ''
+- code: X000009
+  name: 丸善ジュンク堂書店-盛岡店
+  category: store
+  scrape_enabled: true
+  auto_mail_enabled: false
+  priority: 7
+  hold_limit_amount: 10000
+  hold_limit_days: 7
+  mail_limit_amount: 10000
+  mail_limit_days: 3
+  mail_unit_price_limit: 0
+  mail_quantity_limit: 0
+  mail_to_address: ''
+  login_required: false
+  positive_patterns:
+  - 在庫〇
+  - 在庫△
+  - 在庫○
+  negative_patterns:
+  - 在庫✕
+  - 在庫×
+  url_mode: template
+  url_template: https://www.maruzenjunkudo.co.jp/pages/shoplist?product={code}
+  lookup_csv_path: ''
+- code: X000010
+  name: 丸善ジュンク堂書店-仙台アエル店
+  category: store
+  scrape_enabled: true
+  auto_mail_enabled: false
+  priority: 7
+  hold_limit_amount: 10000
+  hold_limit_days: 7
+  mail_limit_amount: 10000
+  mail_limit_days: 3
+  mail_unit_price_limit: 0
+  mail_quantity_limit: 0
+  mail_to_address: ''
+  login_required: false
+  positive_patterns:
+  - 在庫〇
+  - 在庫△
+  - 在庫○
+  negative_patterns:
+  - 在庫✕
+  - 在庫×
+  url_mode: template
+  url_template: https://www.maruzenjunkudo.co.jp/pages/shoplist?product={code}
+  lookup_csv_path: ''
+- code: X000011
+  name: 丸善ジュンク堂書店-秋田店
+  category: store
+  scrape_enabled: true
+  auto_mail_enabled: false
+  priority: 7
+  hold_limit_amount: 10000
+  hold_limit_days: 7
+  mail_limit_amount: 10000
+  mail_limit_days: 3
+  mail_unit_price_limit: 0
+  mail_quantity_limit: 0
+  mail_to_address: ''
+  login_required: false
+  positive_patterns:
+  - 在庫〇
+  - 在庫△
+  - 在庫○
+  negative_patterns:
+  - 在庫✕
+  - 在庫×
+  url_mode: template
+  url_template: https://www.maruzenjunkudo.co.jp/pages/shoplist?product={code}
+  lookup_csv_path: ''
+- code: X000012
+  name: 丸善ジュンク堂書店-大宮高島屋店
+  category: store
+  scrape_enabled: true
+  auto_mail_enabled: false
+  priority: 7
+  hold_limit_amount: 10000
+  hold_limit_days: 7
+  mail_limit_amount: 10000
+  mail_limit_days: 3
+  mail_unit_price_limit: 0
+  mail_quantity_limit: 0
+  mail_to_address: ''
+  login_required: false
+  positive_patterns:
+  - 在庫〇
+  - 在庫△
+  - 在庫○
+  negative_patterns:
+  - 在庫✕
+  - 在庫×
+  url_mode: template
+  url_template: https://www.maruzenjunkudo.co.jp/pages/shoplist?product={code}
+  lookup_csv_path: ''
+- code: X000013
+  name: 丸善ジュンク堂書店-桶川店
+  category: store
+  scrape_enabled: true
+  auto_mail_enabled: false
+  priority: 7
+  hold_limit_amount: 10000
+  hold_limit_days: 7
+  mail_limit_amount: 10000
+  mail_limit_days: 3
+  mail_unit_price_limit: 0
+  mail_quantity_limit: 0
+  mail_to_address: ''
+  login_required: false
+  positive_patterns:
+  - 在庫〇
+  - 在庫△
+  - 在庫○
+  negative_patterns:
+  - 在庫✕
+  - 在庫×
+  url_mode: template
+  url_template: https://www.maruzenjunkudo.co.jp/pages/shoplist?product={code}
+  lookup_csv_path: ''
+- code: X000014
+  name: 丸善ジュンク堂書店-南船橋店
+  category: store
+  scrape_enabled: true
+  auto_mail_enabled: false
+  priority: 7
+  hold_limit_amount: 10000
+  hold_limit_days: 7
+  mail_limit_amount: 10000
+  mail_limit_days: 3
+  mail_unit_price_limit: 0
+  mail_quantity_limit: 0
+  mail_to_address: ''
+  login_required: false
+  positive_patterns:
+  - 在庫〇
+  - 在庫△
+  - 在庫○
+  negative_patterns:
+  - 在庫✕
+  - 在庫×
+  url_mode: template
+  url_template: https://www.maruzenjunkudo.co.jp/pages/shoplist?product={code}
+  lookup_csv_path: ''
+- code: X000015
+  name: 丸善ジュンク堂書店-津田沼店
+  category: store
+  scrape_enabled: true
+  auto_mail_enabled: false
+  priority: 7
+  hold_limit_amount: 10000
+  hold_limit_days: 7
+  mail_limit_amount: 10000
+  mail_limit_days: 3
+  mail_unit_price_limit: 0
+  mail_quantity_limit: 0
+  mail_to_address: ''
+  login_required: false
+  positive_patterns:
+  - 在庫〇
+  - 在庫△
+  - 在庫○
+  negative_patterns:
+  - 在庫✕
+  - 在庫×
+  url_mode: template
+  url_template: https://www.maruzenjunkudo.co.jp/pages/shoplist?product={code}
+  lookup_csv_path: ''
+- code: X000016
+  name: 丸善ジュンク堂書店-吉祥寺店
+  category: store
+  scrape_enabled: true
+  auto_mail_enabled: false
+  priority: 7
+  hold_limit_amount: 10000
+  hold_limit_days: 7
+  mail_limit_amount: 10000
+  mail_limit_days: 3
+  mail_unit_price_limit: 0
+  mail_quantity_limit: 0
+  mail_to_address: ''
+  login_required: false
+  positive_patterns:
+  - 在庫〇
+  - 在庫△
+  - 在庫○
+  negative_patterns:
+  - 在庫✕
+  - 在庫×
+  url_mode: template
+  url_template: https://www.maruzenjunkudo.co.jp/pages/shoplist?product={code}
+  lookup_csv_path: ''
+- code: X000017
+  name: 丸善ジュンク堂書店-大泉学園店
+  category: store
+  scrape_enabled: true
+  auto_mail_enabled: false
+  priority: 7
+  hold_limit_amount: 10000
+  hold_limit_days: 7
+  mail_limit_amount: 10000
+  mail_limit_days: 3
+  mail_unit_price_limit: 0
+  mail_quantity_limit: 0
+  mail_to_address: ''
+  login_required: false
+  positive_patterns:
+  - 在庫〇
+  - 在庫△
+  - 在庫○
+  negative_patterns:
+  - 在庫✕
+  - 在庫×
+  url_mode: template
+  url_template: https://www.maruzenjunkudo.co.jp/pages/shoplist?product={code}
+  lookup_csv_path: ''
+- code: X000018
+  name: 丸善ジュンク堂書店-池袋本店
+  category: store
+  scrape_enabled: true
+  auto_mail_enabled: true
+  priority: 6
+  hold_limit_amount: 4000
+  hold_limit_days: 7
+  mail_limit_amount: 10000
+  mail_limit_days: 3
+  mail_unit_price_limit: 0
+  mail_quantity_limit: 0
+  mail_to_address: ''
+  login_required: false
+  positive_patterns:
+  - 在庫〇
+  - 在庫△
+  - 在庫○
+  negative_patterns:
+  - 在庫✕
+  - 在庫×
+  url_mode: template
+  url_template: https://www.maruzenjunkudo.co.jp/pages/shoplist?product={code}
+  lookup_csv_path: ''
+- code: X000019
+  name: 丸善ジュンク堂書店-立川高島屋店
+  category: store
+  scrape_enabled: true
+  auto_mail_enabled: false
+  priority: 7
+  hold_limit_amount: 10000
+  hold_limit_days: 7
+  mail_limit_amount: 10000
+  mail_limit_days: 3
+  mail_unit_price_limit: 0
+  mail_quantity_limit: 0
+  mail_to_address: ''
+  login_required: false
+  positive_patterns:
+  - 在庫〇
+  - 在庫△
+  - 在庫○
+  negative_patterns:
+  - 在庫✕
+  - 在庫×
+  url_mode: template
+  url_template: https://www.maruzenjunkudo.co.jp/pages/shoplist?product={code}
+  lookup_csv_path: ''
+- code: X000020
+  name: 丸善ジュンク堂書店-丸の内本店
+  category: store
+  scrape_enabled: true
+  auto_mail_enabled: false
+  priority: 7
+  hold_limit_amount: 10000
+  hold_limit_days: 7
+  mail_limit_amount: 10000
+  mail_limit_days: 3
+  mail_unit_price_limit: 0
+  mail_quantity_limit: 0
+  mail_to_address: ''
+  login_required: false
+  positive_patterns:
+  - 在庫〇
+  - 在庫△
+  - 在庫○
+  negative_patterns:
+  - 在庫✕
+  - 在庫×
+  url_mode: template
+  url_template: https://www.maruzenjunkudo.co.jp/pages/shoplist?product={code}
+  lookup_csv_path: ''
+- code: X000021
+  name: 丸善ジュンク堂書店-多摩センター店
+  category: store
+  scrape_enabled: true
+  auto_mail_enabled: false
+  priority: 7
+  hold_limit_amount: 10000
+  hold_limit_days: 7
+  mail_limit_amount: 10000
+  mail_limit_days: 3
+  mail_unit_price_limit: 0
+  mail_quantity_limit: 0
+  mail_to_address: ''
+  login_required: false
+  positive_patterns:
+  - 在庫〇
+  - 在庫△
+  - 在庫○
+  negative_patterns:
+  - 在庫✕
+  - 在庫×
+  url_mode: template
+  url_template: https://www.maruzenjunkudo.co.jp/pages/shoplist?product={code}
+  lookup_csv_path: ''
+- code: X000022
+  name: 丸善ジュンク堂書店-藤沢店
+  category: store
+  scrape_enabled: true
+  auto_mail_enabled: false
+  priority: 7
+  hold_limit_amount: 10000
+  hold_limit_days: 7
+  mail_limit_amount: 10000
+  mail_limit_days: 3
+  mail_unit_price_limit: 0
+  mail_quantity_limit: 0
+  mail_to_address: ''
+  login_required: false
+  positive_patterns:
+  - 在庫〇
+  - 在庫△
+  - 在庫○
+  negative_patterns:
+  - 在庫✕
+  - 在庫×
+  url_mode: template
+  url_template: https://www.maruzenjunkudo.co.jp/pages/shoplist?product={code}
+  lookup_csv_path: ''
+- code: X000023
+  name: 丸善ジュンク堂書店-横浜みなとみらい店
+  category: store
+  scrape_enabled: true
+  auto_mail_enabled: false
+  priority: 7
+  hold_limit_amount: 10000
+  hold_limit_days: 7
+  mail_limit_amount: 10000
+  mail_limit_days: 3
+  mail_unit_price_limit: 0
+  mail_quantity_limit: 0
+  mail_to_address: ''
+  login_required: false
+  positive_patterns:
+  - 在庫〇
+  - 在庫△
+  - 在庫○
+  negative_patterns:
+  - 在庫✕
+  - 在庫×
+  url_mode: template
+  url_template: https://www.maruzenjunkudo.co.jp/pages/shoplist?product={code}
+  lookup_csv_path: ''
+- code: X000024
+  name: 丸善ジュンク堂書店-新潟店
+  category: store
+  scrape_enabled: true
+  auto_mail_enabled: true
+  priority: 7
+  hold_limit_amount: 10000
+  hold_limit_days: 7
+  mail_limit_amount: 10000
+  mail_limit_days: 3
+  mail_unit_price_limit: 0
+  mail_quantity_limit: 0
+  mail_to_address: ''
+  login_required: false
+  positive_patterns:
+  - 在庫〇
+  - 在庫△
+  - 在庫○
+  negative_patterns:
+  - 在庫✕
+  - 在庫×
+  url_mode: template
+  url_template: https://www.maruzenjunkudo.co.jp/pages/shoplist?product={code}
+  lookup_csv_path: ''
+- code: X000025
+  name: 丸善ジュンク堂書店-松本店
+  category: store
+  scrape_enabled: true
+  auto_mail_enabled: false
+  priority: 7
+  hold_limit_amount: 10000
+  hold_limit_days: 7
+  mail_limit_amount: 10000
+  mail_limit_days: 3
+  mail_unit_price_limit: 0
+  mail_quantity_limit: 0
+  mail_to_address: ''
+  login_required: false
+  positive_patterns:
+  - 在庫〇
+  - 在庫△
+  - 在庫○
+  negative_patterns:
+  - 在庫✕
+  - 在庫×
+  url_mode: template
+  url_template: https://www.maruzenjunkudo.co.jp/pages/shoplist?product={code}
+  lookup_csv_path: ''
+- code: X000026
+  name: 丸善ジュンク堂書店-岐阜店
+  category: store
+  scrape_enabled: true
+  auto_mail_enabled: false
+  priority: 7
+  hold_limit_amount: 10000
+  hold_limit_days: 7
+  mail_limit_amount: 10000
+  mail_limit_days: 3
+  mail_unit_price_limit: 0
+  mail_quantity_limit: 0
+  mail_to_address: ''
+  login_required: false
+  positive_patterns:
+  - 在庫〇
+  - 在庫△
+  - 在庫○
+  negative_patterns:
+  - 在庫✕
+  - 在庫×
+  url_mode: template
+  url_template: https://www.maruzenjunkudo.co.jp/pages/shoplist?product={code}
+  lookup_csv_path: ''
+- code: X000027
+  name: 丸善ジュンク堂書店-新静岡店
+  category: store
+  scrape_enabled: true
+  auto_mail_enabled: false
+  priority: 7
+  hold_limit_amount: 10000
+  hold_limit_days: 7
+  mail_limit_amount: 10000
+  mail_limit_days: 3
+  mail_unit_price_limit: 0
+  mail_quantity_limit: 0
+  mail_to_address: ''
+  login_required: false
+  positive_patterns:
+  - 在庫〇
+  - 在庫△
+  - 在庫○
+  negative_patterns:
+  - 在庫✕
+  - 在庫×
+  url_mode: template
+  url_template: https://www.maruzenjunkudo.co.jp/pages/shoplist?product={code}
+  lookup_csv_path: ''
+- code: X000028
+  name: 丸善ジュンク堂書店-名古屋本店
+  category: store
+  scrape_enabled: true
+  auto_mail_enabled: false
+  priority: 7
+  hold_limit_amount: 10000
+  hold_limit_days: 7
+  mail_limit_amount: 10000
+  mail_limit_days: 3
+  mail_unit_price_limit: 0
+  mail_quantity_limit: 0
+  mail_to_address: ''
+  login_required: false
+  positive_patterns:
+  - 在庫〇
+  - 在庫△
+  - 在庫○
+  negative_patterns:
+  - 在庫✕
+  - 在庫×
+  url_mode: template
+  url_template: https://www.maruzenjunkudo.co.jp/pages/shoplist?product={code}
+  lookup_csv_path: ''
+- code: X000029
+  name: 丸善ジュンク堂書店-京都本店
+  category: store
+  scrape_enabled: true
+  auto_mail_enabled: false
+  priority: 7
+  hold_limit_amount: 10000
+  hold_limit_days: 7
+  mail_limit_amount: 10000
+  mail_limit_days: 3
+  mail_unit_price_limit: 0
+  mail_quantity_limit: 0
+  mail_to_address: ''
+  login_required: false
+  positive_patterns:
+  - 在庫〇
+  - 在庫△
+  - 在庫○
+  negative_patterns:
+  - 在庫✕
+  - 在庫×
+  url_mode: template
+  url_template: https://www.maruzenjunkudo.co.jp/pages/shoplist?product={code}
+  lookup_csv_path: ''
+- code: X000030
+  name: 丸善ジュンク堂書店-梅田店
+  category: store
+  scrape_enabled: true
+  auto_mail_enabled: false
+  priority: 6
+  hold_limit_amount: 10000
+  hold_limit_days: 7
+  mail_limit_amount: 10000
+  mail_limit_days: 3
+  mail_unit_price_limit: 0
+  mail_quantity_limit: 0
+  mail_to_address: ''
+  login_required: false
+  positive_patterns:
+  - 在庫〇
+  - 在庫△
+  - 在庫○
+  negative_patterns:
+  - 在庫✕
+  - 在庫×
+  url_mode: template
+  url_template: https://www.maruzenjunkudo.co.jp/pages/shoplist?product={code}
+  lookup_csv_path: ''
+- code: X000031
+  name: 丸善ジュンク堂書店-難波店
+  category: store
+  scrape_enabled: true
+  auto_mail_enabled: false
+  priority: 6
+  hold_limit_amount: 10000
+  hold_limit_days: 7
+  mail_limit_amount: 10000
+  mail_limit_days: 3
+  mail_unit_price_limit: 0
+  mail_quantity_limit: 0
+  mail_to_address: ''
+  login_required: false
+  positive_patterns:
+  - 在庫〇
+  - 在庫△
+  - 在庫○
+  negative_patterns:
+  - 在庫✕
+  - 在庫×
+  url_mode: template
+  url_template: https://www.maruzenjunkudo.co.jp/pages/shoplist?product={code}
+  lookup_csv_path: ''
+- code: X000032
+  name: 丸善ジュンク堂書店-三宮店
+  category: store
+  scrape_enabled: true
+  auto_mail_enabled: false
+  priority: 7
+  hold_limit_amount: 10000
+  hold_limit_days: 7
+  mail_limit_amount: 10000
+  mail_limit_days: 3
+  mail_unit_price_limit: 0
+  mail_quantity_limit: 0
+  mail_to_address: ''
+  login_required: false
+  positive_patterns:
+  - 在庫〇
+  - 在庫△
+  - 在庫○
+  negative_patterns:
+  - 在庫✕
+  - 在庫×
+  url_mode: template
+  url_template: https://www.maruzenjunkudo.co.jp/pages/shoplist?product={code}
+  lookup_csv_path: ''
+- code: X000033
+  name: 丸善ジュンク堂書店-岡山シンフォニービル店
+  category: store
+  scrape_enabled: true
+  auto_mail_enabled: false
+  priority: 7
+  hold_limit_amount: 10000
+  hold_limit_days: 7
+  mail_limit_amount: 10000
+  mail_limit_days: 3
+  mail_unit_price_limit: 0
+  mail_quantity_limit: 0
+  mail_to_address: ''
+  login_required: false
+  positive_patterns:
+  - 在庫〇
+  - 在庫△
+  - 在庫○
+  negative_patterns:
+  - 在庫✕
+  - 在庫×
+  url_mode: template
+  url_template: https://www.maruzenjunkudo.co.jp/pages/shoplist?product={code}
+  lookup_csv_path: ''
+- code: X000034
+  name: 丸善ジュンク堂書店-広島店
+  category: store
+  scrape_enabled: true
+  auto_mail_enabled: false
+  priority: 7
+  hold_limit_amount: 10000
+  hold_limit_days: 7
+  mail_limit_amount: 10000
+  mail_limit_days: 3
+  mail_unit_price_limit: 0
+  mail_quantity_limit: 0
+  mail_to_address: ''
+  login_required: false
+  positive_patterns:
+  - 在庫〇
+  - 在庫△
+  - 在庫○
+  negative_patterns:
+  - 在庫✕
+  - 在庫×
+  url_mode: template
+  url_template: https://www.maruzenjunkudo.co.jp/pages/shoplist?product={code}
+  lookup_csv_path: ''
+- code: X000035
+  name: 丸善ジュンク堂書店-那覇店
+  category: store
+  scrape_enabled: true
+  auto_mail_enabled: false
+  priority: 7
+  hold_limit_amount: 10000
+  hold_limit_days: 7
+  mail_limit_amount: 10000
+  mail_limit_days: 3
+  mail_unit_price_limit: 0
+  mail_quantity_limit: 0
+  mail_to_address: ''
+  login_required: false
+  positive_patterns:
+  - 在庫〇
+  - 在庫△
+  - 在庫○
+  negative_patterns:
+  - 在庫✕
+  - 在庫×
+  url_mode: template
+  url_template: https://www.maruzenjunkudo.co.jp/pages/shoplist?product={code}
+  lookup_csv_path: ''
+- code: X000036
+  name: 紀伊国屋書店_新宿本店
+  category: store
+  scrape_enabled: true
+  auto_mail_enabled: false
+  priority: 8
+  hold_limit_amount: 10000
+  hold_limit_days: 7
+  mail_limit_amount: 10000
+  mail_limit_days: 3
+  mail_unit_price_limit: 0
+  mail_quantity_limit: 0
+  mail_to_address: ''
+  login_required: false
+  positive_patterns:
+  - ◎ 在庫あり
+  - △ 在庫僅少
+  negative_patterns:
+  - × 在庫なし
+  - 在庫なし
+  - 取り扱いがない
+  - 該当する結果がありません
+  url_mode: template
+  url_template: https://www.kinokuniya.co.jp/f/dsg-01-{code}
+  lookup_csv_path: ''
+- code: X000037
+  name: 紀伊国屋書店_梅田本店
+  category: store
+  scrape_enabled: true
+  auto_mail_enabled: false
+  priority: 8
+  hold_limit_amount: 10000
+  hold_limit_days: 7
+  mail_limit_amount: 10000
+  mail_limit_days: 3
+  mail_unit_price_limit: 0
+  mail_quantity_limit: 0
+  mail_to_address: ''
+  login_required: false
+  positive_patterns:
+  - ◎ 在庫あり
+  - △ 在庫僅少
+  negative_patterns:
+  - × 在庫なし
+  - 在庫なし
+  - 取り扱いがない
+  - 該当する結果がありません
+  url_mode: template
+  url_template: https://www.kinokuniya.co.jp/f/dsg-01-{code}
+  lookup_csv_path: ''
+- code: X000038
+  name: 紀伊国屋書店_グランフロント大阪店
+  category: store
+  scrape_enabled: true
+  auto_mail_enabled: false
+  priority: 8
+  hold_limit_amount: 10000
+  hold_limit_days: 7
+  mail_limit_amount: 10000
+  mail_limit_days: 3
+  mail_unit_price_limit: 0
+  mail_quantity_limit: 0
+  mail_to_address: ''
+  login_required: false
+  positive_patterns:
+  - ◎ 在庫あり
+  - △ 在庫僅少
+  negative_patterns:
+  - × 在庫なし
+  - 在庫なし
+  - 取り扱いがない
+  - 該当する結果がありません
+  url_mode: template
+  url_template: https://www.kinokuniya.co.jp/f/dsg-01-{code}
+  lookup_csv_path: ''
+- code: X000039
+  name: 紀伊国屋書店_札幌本店
+  category: store
+  scrape_enabled: true
+  auto_mail_enabled: false
+  priority: 8
+  hold_limit_amount: 10000
+  hold_limit_days: 7
+  mail_limit_amount: 10000
+  mail_limit_days: 3
+  mail_unit_price_limit: 0
+  mail_quantity_limit: 0
+  mail_to_address: ''
+  login_required: false
+  positive_patterns:
+  - ◎ 在庫あり
+  - △ 在庫僅少
+  negative_patterns:
+  - × 在庫なし
+  - 在庫なし
+  - 取り扱いがない
+  - 該当する結果がありません
+  url_mode: template
+  url_template: https://www.kinokuniya.co.jp/f/dsg-01-{code}
+- code: X000040
+  name: 三省堂書店_神保町本店仮店舗
+  category: store
+  scrape_enabled: true
+  auto_mail_enabled: false
+  priority: 8
+  hold_limit_amount: 10000
+  hold_limit_days: 7
+  mail_limit_amount: 10000
+  mail_limit_days: 3
+  mail_unit_price_limit: 0
+  mail_quantity_limit: 0
+  mail_to_address: ''
+  login_required: false
+  positive_patterns:
+  - ○
+  - 〇
+  - △
+  - 在庫あり
+  negative_patterns:
+  - ×
+  - ✕
+  - 更新中
+  - 在庫なし
+  url_mode: template
+  url_template: https://www.books-sanseido.jp/booksearch/BookStockList.action?shopCode=&areaCode=&shoshiKubun=1&isbn={code}
+  lookup_csv_path: ''
+- code: X000041
+  name: 三省堂書店_池袋本店
+  category: store
+  scrape_enabled: true
+  auto_mail_enabled: false
+  priority: 8
+  hold_limit_amount: 10000
+  hold_limit_days: 7
+  mail_limit_amount: 10000
+  mail_limit_days: 3
+  mail_unit_price_limit: 0
+  mail_quantity_limit: 0
+  mail_to_address: ''
+  login_required: false
+  positive_patterns:
+  - ○
+  - 〇
+  - △
+  - 在庫あり
+  negative_patterns:
+  - ×
+  - ✕
+  - 更新中
+  - 在庫なし
+  url_mode: template
+  url_template: https://www.books-sanseido.jp/booksearch/BookStockList.action?shopCode=&areaCode=&shoshiKubun=1&isbn={code}
+  lookup_csv_path: ''

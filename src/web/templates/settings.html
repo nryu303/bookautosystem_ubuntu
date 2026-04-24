@@ -1,0 +1,467 @@
+{% extends "base.html" %}
+{% block title %}設定 - BookAutoSystem{% endblock %}
+{% block content %}
+<h4>コントロールパネル</h4>
+
+<!-- タブ切替 -->
+<ul class="nav nav-tabs mb-3" role="tablist">
+    <li class="nav-item">
+        <a class="nav-link {% if active_tab == 'suppliers' or (active_tab != 'templates' and active_tab != 'patterns') %}active{% endif %}" id="tab-suppliers"
+           data-bs-toggle="tab" href="#pane-suppliers" role="tab">仕入先設定</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if active_tab == 'templates' %}active{% endif %}" id="tab-templates"
+           data-bs-toggle="tab" href="#pane-templates" role="tab">メールテンプレート</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if active_tab == 'patterns' %}active{% endif %}" id="tab-patterns"
+           data-bs-toggle="tab" href="#pane-patterns" role="tab">抽出パターン</a>
+    </li>
+    <li class="nav-item ms-auto">
+        <a class="nav-link text-primary" href="/pattern-editor">
+            <strong>&#9998; ビジュアルエディタを開く</strong>
+        </a>
+    </li>
+</ul>
+
+<div class="tab-content">
+
+<!-- ====== 仕入先設定タブ ====== -->
+<div class="tab-pane fade {% if active_tab != 'templates' %}show active{% endif %}" id="pane-suppliers" role="tabpanel">
+
+{% for s in suppliers %}
+<div class="card mb-3 supplier-card">
+    <form method="POST" action="/settings/update">
+    <input type="hidden" name="supplier_id" value="{{ s.id }}">
+    <div class="card-header d-flex justify-content-between align-items-center py-2">
+        <div>
+            <strong>{{ s.supplier_name }}</strong>
+            {% if s.category == 'ec' %}
+            <span class="badge bg-primary ms-1">EC</span>
+            {% else %}
+            <span class="badge bg-secondary ms-1">店頭</span>
+            {% endif %}
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <code class="text-muted" style="font-size:.75rem">{{ s.supplier_code }}</code>
+            <button type="submit" class="btn btn-sm btn-primary">保存</button>
+        </div>
+    </div>
+    <div class="card-body py-2">
+        <div class="row g-2">
+            <!-- Row 1: Core settings -->
+            <div class="col-6 col-sm-4 col-lg-2">
+                <label class="form-label mb-0 small text-muted">優先順</label>
+                <input type="number" name="priority" value="{{ s.priority }}" class="form-control form-control-sm">
+            </div>
+            <div class="col-6 col-sm-4 col-lg-2 d-flex align-items-end pb-1">
+                <div class="form-check">
+                    <input type="checkbox" name="scrape_enabled" value="1" class="form-check-input" id="sc_{{ s.id }}" {% if s.scrape_enabled %}checked{% endif %}>
+                    <label class="form-check-label small" for="sc_{{ s.id }}">スクレイピング</label>
+                </div>
+            </div>
+            <div class="col-6 col-sm-4 col-lg-2 d-flex align-items-end pb-1">
+                <div class="form-check">
+                    <input type="checkbox" name="auto_mail_enabled" value="1" class="form-check-input" id="am_{{ s.id }}" {% if s.auto_mail_enabled %}checked{% endif %}>
+                    <label class="form-check-label small" for="am_{{ s.id }}">自動メール</label>
+                </div>
+            </div>
+            <div class="col-12 col-sm-8 col-lg-6">
+                <label class="form-label mb-0 small text-muted">メール送信先</label>
+                <input type="email" name="mail_to_address" value="{{ s.mail_to_address or '' }}" class="form-control form-control-sm" placeholder="example@mail.com">
+            </div>
+
+            <!-- Row 2: Hold settings -->
+            <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                <label class="form-label mb-0 small text-muted">保留上限金額</label>
+                <input type="number" name="hold_limit_amount" value="{{ s.hold_limit_amount }}" class="form-control form-control-sm">
+            </div>
+            <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                <label class="form-label mb-0 small text-muted">保留上限日数</label>
+                <input type="number" name="hold_limit_days" value="{{ s.hold_limit_days }}" class="form-control form-control-sm">
+            </div>
+            <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                <label class="form-label mb-0 small text-muted">メール上限金額</label>
+                <input type="number" name="mail_limit_amount" value="{{ s.mail_limit_amount or 0 }}" class="form-control form-control-sm">
+            </div>
+            <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                <label class="form-label mb-0 small text-muted">メール上限日数</label>
+                <input type="number" name="mail_limit_days" value="{{ s.mail_limit_days or 0 }}" class="form-control form-control-sm">
+            </div>
+            <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                <label class="form-label mb-0 small text-muted">制限単価</label>
+                <input type="number" name="mail_unit_price_limit" value="{{ s.mail_unit_price_limit or 0 }}" class="form-control form-control-sm">
+            </div>
+            <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                <label class="form-label mb-0 small text-muted">制限個数</label>
+                <input type="number" name="mail_quantity_limit" value="{{ s.mail_quantity_limit or 0 }}" class="form-control form-control-sm">
+            </div>
+
+            <!-- Row 3: Stock patterns -->
+            <div class="col-12 col-lg-6">
+                <label class="form-label mb-0 small text-muted">在庫ありパターン <span class="text-secondary">(1行1パターン)</span></label>
+                <textarea name="positive_patterns" class="form-control form-control-sm" rows="3"
+                          style="font-family:monospace; font-size:.82rem;"
+                          placeholder="在庫あり&#10;カートに入れる">{{ s.positive_patterns_text or '' }}</textarea>
+            </div>
+            <div class="col-12 col-lg-6">
+                <label class="form-label mb-0 small text-muted">在庫なしパターン <span class="text-secondary">(1行1パターン)</span></label>
+                <textarea name="negative_patterns" class="form-control form-control-sm" rows="3"
+                          style="font-family:monospace; font-size:.82rem;"
+                          placeholder="在庫なし&#10;お取り寄せ">{{ s.negative_patterns_text or '' }}</textarea>
+            </div>
+        </div>
+    </div>
+    </form>
+</div>
+{% endfor %}
+
+</div>
+
+<!-- ====== メールテンプレートタブ ====== -->
+<div class="tab-pane fade {% if active_tab == 'templates' %}show active{% endif %}" id="pane-templates" role="tabpanel">
+<form method="POST" action="/settings/templates/update">
+
+    <div class="card mb-4">
+        <div class="card-header" style="background:var(--color-brand);color:#fff;">
+            <strong>実店舗向け注文メール（store_order）</strong>
+        </div>
+        <div class="card-body">
+            <p class="text-muted small mb-3">
+                差込変数:
+                <code>{supplier_name}</code>
+                <code>{product_name}</code>
+                <code>{product_code}</code>
+                <code>{amount}</code>
+                <code>{quantity}</code>
+            </p>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">件名</label>
+                <input type="text" name="store_order_subject" class="form-control"
+                       value="{{ templates.get('store_order', {}).get('subject', '') }}"
+                       placeholder="【注文依頼】{product_name} ({product_code})">
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">本文</label>
+                <textarea name="store_order_body" class="form-control" rows="10"
+                          style="font-family:monospace; font-size:.85rem;"
+                          placeholder="テンプレート本文を入力...">{{ templates.get('store_order', {}).get('body', '') }}</textarea>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header" style="background:var(--color-brand);color:#fff;">
+            <strong>複数商品まとめ注文メール（store_bulk_order）</strong>
+        </div>
+        <div class="card-body">
+            <p class="text-muted small mb-3">
+                差込変数:
+                <code>{supplier_name}</code>
+                <code>{items_list}</code>
+                <code>{amount}</code>
+                <code>{quantity}</code>
+            </p>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">件名</label>
+                <input type="text" name="store_bulk_order_subject" class="form-control"
+                       value="{{ templates.get('store_bulk_order', {}).get('subject', '') }}"
+                       placeholder="【注文依頼】{supplier_name} 宛 {quantity}点">
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">本文</label>
+                <textarea name="store_bulk_order_body" class="form-control" rows="10"
+                          style="font-family:monospace; font-size:.85rem;"
+                          placeholder="テンプレート本文を入力...">{{ templates.get('store_bulk_order', {}).get('body', '') }}</textarea>
+            </div>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary mb-4 w-100">テンプレートを保存</button>
+</form>
+</div>
+
+<!-- ====== 抽出パターンタブ ====== -->
+<div class="tab-pane fade {% if active_tab == 'patterns' %}show active{% endif %}" id="pane-patterns" role="tabpanel">
+
+<div class="row">
+    <!-- 左: 仕入先選択 + パターン一覧 -->
+    <div class="col-lg-5 mb-3">
+        <div class="card">
+            <div class="card-header" style="background:var(--color-brand);color:#fff;">
+                <strong>仕入先を選択</strong>
+            </div>
+            <div class="card-body py-2">
+                <select id="pe-supplier-select" class="form-select form-select-sm mb-2">
+                    <option value="">-- 仕入先を選んでください --</option>
+                    {% for s in suppliers %}
+                    <option value="{{ s.id }}" data-code="{{ s.supplier_code }}">{{ s.supplier_name }} ({{ s.supplier_code }})</option>
+                    {% endfor %}
+                </select>
+                <button class="btn btn-sm btn-outline-primary w-100 mb-2" onclick="peLoadPreview()">HTMLプレビュー読込</button>
+            </div>
+        </div>
+
+        <!-- URLテンプレート -->
+        <div class="card mt-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <strong>URLテンプレート</strong>
+                <button class="btn btn-sm btn-primary" onclick="peSaveUrlTemplate()">保存</button>
+            </div>
+            <div class="card-body py-2">
+                <p class="text-muted small mb-1">商品コードは <code>{code}</code> で置換されます</p>
+                <input type="text" id="pe-url-template" class="form-control form-control-sm"
+                       placeholder="https://example.com/search?q={code}" disabled>
+                <div id="pe-url-msg" class="small mt-1" style="display:none;"></div>
+            </div>
+        </div>
+
+        <!-- 登録済みパターン -->
+        <div class="card mt-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <strong>登録済みパターン</strong>
+                <button class="btn btn-sm btn-success" onclick="peAddRow()">+ 追加</button>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-sm table-bordered mb-0" id="pe-patterns-table">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width:25%">データ種別</th>
+                            <th style="width:35%">CSSセレクタ</th>
+                            <th style="width:25%">テキストヒント</th>
+                            <th style="width:15%">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pe-patterns-body">
+                        <tr><td colspan="4" class="text-center text-muted py-3">仕入先を選択してください</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 右: HTMLプレビュー (テキストノード一覧) -->
+    <div class="col-lg-7 mb-3">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <strong>HTMLテキストノード一覧</strong>
+                <span class="text-muted small" id="pe-preview-info"></span>
+            </div>
+            <div class="card-body p-0" style="max-height:70vh; overflow-y:auto;">
+                <table class="table table-sm table-hover table-bordered mb-0">
+                    <thead class="table-light" style="position:sticky; top:0; z-index:1;">
+                        <tr>
+                            <th style="width:10%">タグ</th>
+                            <th style="width:30%">セレクタ</th>
+                            <th style="width:40%">テキスト</th>
+                            <th style="width:20%">割り当て</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pe-preview-body">
+                        <tr><td colspan="4" class="text-center text-muted py-5">「HTMLプレビュー読込」を押してください</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const PE_FIELDS = [
+    {value: '', label: '-- skip --'},
+    {value: 'stock_text', label: '在庫テキスト'},
+    {value: 'price', label: '価格'},
+    {value: 'product_title', label: '商品名'},
+    {value: 'positive_signal', label: '在庫あり判定'},
+    {value: 'negative_signal', label: '在庫なし判定'},
+];
+
+function peFieldSelect(selected) {
+    let html = '';
+    PE_FIELDS.forEach(f => {
+        html += `<option value="${f.value}" ${f.value === selected ? 'selected' : ''}>${f.label}</option>`;
+    });
+    return `<select class="form-select form-select-sm">${html}</select>`;
+}
+
+function peGetSupplierId() {
+    return document.getElementById('pe-supplier-select').value;
+}
+
+// Load patterns for selected supplier
+async function peLoadPatterns() {
+    const sid = peGetSupplierId();
+    const tbody = document.getElementById('pe-patterns-body');
+    if (!sid) {
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-3">仕入先を選択してください</td></tr>';
+        return;
+    }
+    const resp = await fetch(`/api/patterns/${sid}`);
+    const patterns = await resp.json();
+    if (patterns.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-3">パターン未登録</td></tr>';
+        return;
+    }
+    tbody.innerHTML = '';
+    patterns.forEach(p => {
+        const tr = document.createElement('tr');
+        tr.dataset.patternId = p.id;
+        tr.innerHTML = `
+            <td>${peFieldSelect(p.field_name)}</td>
+            <td><input type="text" class="form-control form-control-sm" value="${p.selector || ''}" placeholder="div.stock-info"></td>
+            <td><input type="text" class="form-control form-control-sm" value="${p.text_hint || ''}" placeholder="在庫"></td>
+            <td>
+                <button class="btn btn-sm btn-primary me-1" onclick="peSaveRow(this)">保存</button>
+                <button class="btn btn-sm btn-outline-danger" onclick="peDeleteRow(this)">削除</button>
+            </td>`;
+        tbody.appendChild(tr);
+    });
+}
+
+// Add new pattern row
+function peAddRow() {
+    const sid = peGetSupplierId();
+    if (!sid) { alert('仕入先を選択してください'); return; }
+    const tbody = document.getElementById('pe-patterns-body');
+    // Clear placeholder
+    if (tbody.querySelector('td[colspan]')) tbody.innerHTML = '';
+    const tr = document.createElement('tr');
+    tr.dataset.patternId = '';
+    tr.innerHTML = `
+        <td>${peFieldSelect('')}</td>
+        <td><input type="text" class="form-control form-control-sm" value="" placeholder="div.stock-info"></td>
+        <td><input type="text" class="form-control form-control-sm" value="" placeholder="在庫"></td>
+        <td>
+            <button class="btn btn-sm btn-primary me-1" onclick="peSaveRow(this)">保存</button>
+            <button class="btn btn-sm btn-outline-danger" onclick="peDeleteRow(this)">削除</button>
+        </td>`;
+    tbody.appendChild(tr);
+}
+
+// Save one pattern row
+async function peSaveRow(btn) {
+    const sid = peGetSupplierId();
+    const tr = btn.closest('tr');
+    const data = {
+        id: tr.dataset.patternId ? parseInt(tr.dataset.patternId) : null,
+        field_name: tr.querySelector('select').value,
+        selector: tr.querySelectorAll('input')[0].value,
+        text_hint: tr.querySelectorAll('input')[1].value,
+    };
+    if (!data.field_name) { alert('データ種別を選択してください'); return; }
+    const resp = await fetch(`/api/patterns/${sid}`, {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data),
+    });
+    if (resp.ok) {
+        peLoadPatterns();
+    }
+}
+
+// Delete one pattern
+async function peDeleteRow(btn) {
+    const sid = peGetSupplierId();
+    const tr = btn.closest('tr');
+    const pid = tr.dataset.patternId;
+    if (!pid) { tr.remove(); return; }
+    if (!confirm('このパターンを削除しますか？')) return;
+    await fetch(`/api/patterns/${sid}/${pid}`, {method: 'DELETE'});
+    peLoadPatterns();
+}
+
+// Load HTML preview
+async function peLoadPreview() {
+    const sid = peGetSupplierId();
+    const tbody = document.getElementById('pe-preview-body');
+    const info = document.getElementById('pe-preview-info');
+    if (!sid) { alert('仕入先を選択してください'); return; }
+    info.textContent = '読込中...';
+    tbody.innerHTML = '<tr><td colspan="4" class="text-center py-3">読込中...</td></tr>';
+
+    const resp = await fetch(`/api/html_preview/${sid}`);
+    const data = await resp.json();
+    if (data.error) {
+        tbody.innerHTML = `<tr><td colspan="4" class="text-center text-danger py-3">${data.error}</td></tr>`;
+        info.textContent = '';
+        return;
+    }
+    info.textContent = `${data.nodes.length} ノード検出`;
+    tbody.innerHTML = '';
+    data.nodes.forEach((n, i) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><code class="text-muted">${n.tag}</code></td>
+            <td><code style="font-size:.75rem; word-break:break-all;">${n.selector}</code></td>
+            <td style="font-size:.82rem;">${escHtml(n.text)}</td>
+            <td>${peFieldSelect('')}</td>`;
+        // When user selects a field, auto-add as pattern
+        const sel = tr.querySelector('select');
+        sel.addEventListener('change', () => {
+            if (sel.value) peQuickAdd(n.selector, n.text, sel.value);
+        });
+        tbody.appendChild(tr);
+    });
+}
+
+// Quick-add from preview
+async function peQuickAdd(selector, text, fieldName) {
+    const sid = peGetSupplierId();
+    await fetch(`/api/patterns/${sid}`, {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({field_name: fieldName, selector: selector, text_hint: ''}),
+    });
+    peLoadPatterns();
+}
+
+function escHtml(s) {
+    const d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+}
+
+// ── URL Template ──
+async function peLoadUrlTemplate() {
+    const sid = peGetSupplierId();
+    const input = document.getElementById('pe-url-template');
+    const msg = document.getElementById('pe-url-msg');
+    msg.style.display = 'none';
+    if (!sid) { input.value = ''; input.disabled = true; return; }
+    input.disabled = false;
+    const resp = await fetch(`/api/url_template/${sid}`);
+    const data = await resp.json();
+    input.value = data.url_template || '';
+}
+
+async function peSaveUrlTemplate() {
+    const sid = peGetSupplierId();
+    const input = document.getElementById('pe-url-template');
+    const msg = document.getElementById('pe-url-msg');
+    if (!sid) { alert('仕入先を選択してください'); return; }
+    const resp = await fetch(`/api/url_template/${sid}`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({url_template: input.value}),
+    });
+    if (resp.ok) {
+        msg.textContent = '保存しました';
+        msg.className = 'small mt-1 text-success';
+        msg.style.display = 'block';
+        setTimeout(() => { msg.style.display = 'none'; }, 2000);
+    } else {
+        msg.textContent = '保存に失敗しました';
+        msg.className = 'small mt-1 text-danger';
+        msg.style.display = 'block';
+    }
+}
+
+// Auto-load patterns + URL template on supplier change
+document.getElementById('pe-supplier-select').addEventListener('change', function() {
+    peLoadPatterns();
+    peLoadUrlTemplate();
+});
+</script>
+
+</div>
+
+</div><!-- tab-content -->
+{% endblock %}

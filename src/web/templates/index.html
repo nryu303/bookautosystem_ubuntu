@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}処理台帳 - BookAutoSystem{% endblock %}
+{% block content %}
+<h4>処理台帳</h4>
+
+<!-- メール取込状況 -->
+<div class="mail-stats-bar mb-3">
+    <span class="text-muted">メール取込:</span>
+    <strong>{{ mail_stats.total or 0 }}</strong>件受信
+    / <span class="text-success"><strong>{{ mail_stats.done or 0 }}</strong>件解析済</span>
+    / <span class="text-secondary">{{ mail_stats.skipped or 0 }}件スキップ</span>
+    / <span class="text-warning">{{ mail_stats.pending or 0 }}件未処理</span>
+    {% if mail_stats.error and mail_stats.error > 0 %}
+    / <span class="text-danger"><strong>{{ mail_stats.error }}件エラー</strong></span>
+    {% endif %}
+</div>
+
+<!-- 注文ステータス -->
+<div class="row mb-3 g-2">
+    <div class="col">
+        <div class="stat-card">全体<strong>{{ stats.total or 0 }}</strong></div>
+    </div>
+    <div class="col">
+        <div class="stat-card" style="border-left:3px solid #94a3b8">未処理<strong class="status-PENDING">{{ stats.pending or 0 }}</strong></div>
+    </div>
+    <div class="col">
+        <div class="stat-card" style="border-left:3px solid #16a34a">自家在庫<strong class="status-SELF_STOCK">{{ stats.self_stock or 0 }}</strong></div>
+    </div>
+    <div class="col">
+        <div class="stat-card" style="border-left:3px solid #ea580c">保留中<strong class="status-HOLD">{{ stats.hold or 0 }}</strong></div>
+    </div>
+    <div class="col">
+        <div class="stat-card" style="border-left:3px solid #94a3b8">在庫なし<strong style="color:#94a3b8">{{ stats.no_stock or 0 }}</strong></div>
+    </div>
+    <div class="col">
+        <div class="stat-card" style="border-left:3px solid #2563eb">発注確定<strong class="status-ORDERED">{{ stats.ordered or 0 }}</strong></div>
+    </div>
+    <div class="col">
+        <div class="stat-card" style="border-left:3px solid #dc2626">エラー<strong class="status-ERROR">{{ stats.error or 0 }}</strong></div>
+    </div>
+</div>
+
+<div class="filter-bar mb-3">
+    <a href="/" class="btn btn-sm {% if not status_filter %}btn-primary{% else %}btn-outline-primary{% endif %}">全て</a>
+    <a href="/?status=PENDING" class="btn btn-sm {% if status_filter=='PENDING' %}btn-secondary{% else %}btn-outline-secondary{% endif %}">未処理</a>
+    <a href="/?status=SELF_STOCK" class="btn btn-sm {% if status_filter=='SELF_STOCK' %}btn-success{% else %}btn-outline-success{% endif %}">自家在庫</a>
+    <a href="/?status=HOLD" class="btn btn-sm {% if status_filter=='HOLD' %}btn-warning{% else %}btn-outline-warning{% endif %}">保留中</a>
+    <a href="/?status=NO_STOCK" class="btn btn-sm {% if status_filter=='NO_STOCK' %}btn-secondary{% else %}btn-outline-secondary{% endif %}">在庫なし</a>
+    <a href="/?status=ORDERED" class="btn btn-sm {% if status_filter=='ORDERED' %}btn-primary{% else %}btn-outline-primary{% endif %}">発注確定</a>
+    <a href="/?status=ERROR" class="btn btn-sm {% if status_filter=='ERROR' %}btn-danger{% else %}btn-outline-danger{% endif %}">エラー</a>
+</div>
+
+<div class="table-responsive">
+<table class="table table-bordered table-hover table-sm">
+    <thead class="table-primary">
+        <tr>
+            <th>ID</th>
+            <th>管理番号</th>
+            <th>受信日</th>
+            <th>商品名</th>
+            <th>商品コード</th>
+            <th>金額</th>
+            <th>数量</th>
+            <th>状態</th>
+            <th>予定仕入先</th>
+            <th>振分日</th>
+            <th>詳細</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in items %}
+        <tr>
+            <td class="text-center">{{ item.id }}</td>
+            <td><code>{{ item.order_number or '-' }}</code></td>
+            <td>{{ item.received_at or '-' }}</td>
+            <td>{{ item.product_name or '-' }}</td>
+            <td><code>{{ item.product_code_normalized or '-' }}</code></td>
+            <td class="text-end">{{ '{:,}'.format(item.amount or 0) }}</td>
+            <td class="text-center">{{ item.quantity or 1 }}</td>
+            <td class="status-{{ item.current_status }}"><strong>{{ order_label(item.current_status) }}</strong></td>
+            <td>{{ item.planned_supplier_name or '-' }}</td>
+            <td>{{ item.assigned_at or '-' }}</td>
+            <td class="text-center"><a href="/item/{{ item.id }}" class="btn btn-sm btn-outline-primary">詳細</a></td>
+            <td class="text-center">
+                <form action="/item/{{ item.id }}/delete" method="POST" style="display:inline"
+                      onsubmit="return confirm('この注文商品を削除しますか？\n関連するスクレイピング結果・保留情報・送信メールも削除されます。')">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">削除</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endblock %}

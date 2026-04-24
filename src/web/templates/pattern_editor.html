@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+{% block title %}抽出パターンエディタ - BookAutoSystem{% endblock %}
+{% block content %}
+
+<!-- ヘッダー -->
+<div class="d-flex align-items-center mb-3">
+    <a href="/settings?tab=patterns" class="btn btn-sm btn-outline-secondary me-3">&larr; 設定</a>
+    <h4 class="mb-0 me-3">抽出パターンエディタ</h4>
+    <select id="pe-supplier" class="form-select form-select-sm" style="max-width:320px;">
+        <option value="">-- 仕入先を選択 --</option>
+        {% for s in suppliers %}
+        <option value="{{ s.id }}">{{ s.supplier_name }} ({{ s.supplier_code }})</option>
+        {% endfor %}
+    </select>
+    <button class="btn btn-sm btn-primary ms-2" onclick="peLoad()">読込</button>
+</div>
+
+<div class="row g-3" style="height:calc(100vh - 160px);">
+    <!-- 左: iframeプレビュー -->
+    <div class="col-lg-8 d-flex flex-column" style="height:100%;">
+        <div class="card flex-grow-1 d-flex flex-column" style="overflow:hidden;">
+            <div class="card-header py-2 d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>ページプレビュー</strong>
+                    <span class="text-muted small ms-2" id="pe-status">仕入先を選択してください</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge" style="background:#16a34a;">在庫テキスト</span>
+                    <span class="badge" style="background:#9333ea;">価格</span>
+                    <span class="badge" style="background:#0891b2;">商品名</span>
+                    <span class="badge" style="background:#f59e0b;">ホバー中</span>
+                </div>
+            </div>
+            <div class="card-body p-0 flex-grow-1" style="position:relative;">
+                <div id="pe-placeholder" style="display:flex; align-items:center; justify-content:center; height:100%; color:#94a3b8;">
+                    <div class="text-center">
+                        <div style="font-size:3rem; margin-bottom:1rem;">&#128270;</div>
+                        <p>仕入先を選択して「読込」を押してください</p>
+                        <p class="small">ページ上の要素をクリックしてデータ種別を割り当てます</p>
+                    </div>
+                </div>
+                <iframe id="pe-iframe" style="width:100%; height:100%; border:none; display:none;"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- 右: 登録済みパターン一覧 -->
+    <div class="col-lg-4 d-flex flex-column" style="height:100%;">
+        <div class="card flex-grow-1 d-flex flex-column" style="overflow:hidden;">
+            <div class="card-header py-2 d-flex justify-content-between align-items-center">
+                <strong>登録済みパターン</strong>
+                <span class="badge bg-secondary" id="pe-count">0件</span>
+            </div>
+            <div class="card-body p-0 flex-grow-1" style="overflow-y:auto;">
+                <div id="pe-patterns-list" style="padding:0;">
+                    <div class="text-center text-muted py-5">パターン未登録</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const PE_FIELD_LABELS = {
+    stock_text: '在庫テキスト',
+    price: '価格',
+    product_title: '商品名',
+    positive_signal: '在庫あり判定',
+    negative_signal: '在庫なし判定',
+};
+const PE_FIELD_COLORS = {
+    stock_text: '#16a34a',
+    price: '#9333ea',
+    product_title: '#0891b2',
+    positive_signal: '#16a34a',
+    negative_signal: '#dc2626',
+};
+
+let currentSupplierId = null;
+
+// ── Load iframe + patterns ──
+function peLoad() {
+    const sid = document.getElementById('pe-supplier').value;
+    if (!sid) { alert('仕入先を選択してください'); return; }
+    currentSupplierId = sid;
+
+    const iframe = document.getElementById('pe-iframe');
+    const placeholder = document.getElementById('pe-placeholder');
+    const status = document.getElementById('pe-status');
+
+    status.textContent = '読込中...';
+    placeholder.style.display = 'none';
+    iframe.style.display = 'block';
+    iframe.src = '/api/html_snapshot/' + sid;
+
+    // When iframe loads, highlight existing patterns
+    iframe.onload = function() {
+        status.textContent = 'クリックで要素を選択';
+        peLoadPatterns(true);
+    };
+}
+
+// ── Load patterns list + highlight in iframe ──
+async function peLoadPatterns(highlightInIframe) {
+    if (!currentSupplierId) return;
+    const resp = await fetch('/api/patterns/' + currentSupplierId);
+    const patterns = await resp.json();
+    const list = document.getElementById('pe-patterns-list');
+    const count = document.getElementById('pe-count');
+    count.textContent = patterns.length + '件';
+
+    if (patterns.length === 0) {
+        list.innerHTML = '<div class="text-center text-muted py-5">パターン未登録<br><span class="small">左のページ上の要素をクリックして<br>データ種別を割り当ててください</span></div>';
+    } else {
+        list.innerHTML = '';
+        patterns.forEach(p => {
+            const color = PE_FIELD_COLORS[p.field_name] || '#64748b';
+            const label = PE_FIELD_LABELS[p.field_name] || p.field_name;
+            const card = document.createElement('div');
+            card.style.cssText = 'padding:10px 14px; border-bottom:1px solid #e2e8f0; font-size:.82rem;';
+            card.innerHTML = `
+                <div class="d-flex justify-content-between align-items-start mb-1">
+                    <span class="badge" style="background:${color};">${label}</span>
+                    <button class="btn btn-sm btn-outline-danger" style="font-size:.7rem; padding:1px 8px;"
+                            onclick="peDelete(${p.id})">削除</button>
+                </div>
+                <div style="margin-top:4px;">
+                    <code style="font-size:.75rem; word-break:break-all; color:#475569;">${escHtml(p.selector || '')}</code>
+                </div>
+                ${p.text_hint ? '<div class="text-muted" style="font-size:.75rem; margin-top:2px;">ヒント: ' + escHtml(p.text_hint) + '</div>' : ''}`;
+            list.appendChild(card);
+        });
+    }
+
+    // Highlight in iframe
+    if (highlightInIframe) {
+        const iframe = document.getElementById('pe-iframe');
+        if (iframe.contentWindow) {
+            iframe.contentWindow.postMessage({
+                type: 'pe-highlight',
+                patterns: patterns,
+            }, '*');
+        }
+    }
+}
+
+// ── Listen for assignments from iframe ──
+window.addEventListener('message', async function(e) {
+    if (!e.data || e.data.type !== 'pe-assign') return;
+    if (!currentSupplierId) return;
+
+    const resp = await fetch('/api/patterns/' + currentSupplierId, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            field_name: e.data.field_name,
+            selector: e.data.selector,
+            text_hint: '',
+        }),
+    });
+    if (resp.ok) {
+        peLoadPatterns(false);
+    }
+});
+
+// ── Delete pattern ──
+async function peDelete(patternId) {
+    if (!confirm('このパターンを削除しますか？')) return;
+    await fetch('/api/patterns/' + currentSupplierId + '/' + patternId, {method: 'DELETE'});
+    peLoadPatterns(false);
+    // Reload iframe to clear highlights
+    const iframe = document.getElementById('pe-iframe');
+    if (iframe.src) iframe.src = iframe.src;
+    iframe.onload = function() { peLoadPatterns(true); };
+}
+
+function escHtml(s) {
+    const d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+}
+</script>
+
+{% endblock %}

@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+{% block title %}商品詳細 #{{ item.id }} - BookAutoSystem{% endblock %}
+{% block content %}
+<div class="d-flex align-items-center mb-3">
+    <a href="/" class="btn btn-sm btn-outline-secondary me-3">&larr; 戻る</a>
+    <h4 class="mb-0 me-auto">商品詳細 <span class="text-muted">#{{ item.id }}</span></h4>
+    <form action="/item/{{ item.id }}/delete" method="POST" style="display:inline"
+          onsubmit="return confirm('この注文商品を削除しますか？\n関連するスクレイピング結果・保留情報・送信メールも削除されます。')">
+        <button type="submit" class="btn btn-sm btn-danger">この商品を削除</button>
+    </form>
+</div>
+
+<!-- 商品情報カード -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6 col-lg-4">
+                <table class="table table-sm info-table mb-2">
+                    <tr><th>管理番号</th><td><code>{{ item.order_number or '-' }}</code></td></tr>
+                    <tr><th>宛先</th><td>{{ item.recipient_name or '-' }}</td></tr>
+                    <tr><th>商品名</th><td><strong>{{ item.product_name or '-' }}</strong></td></tr>
+                    <tr><th>著者</th><td>{{ item.author or '-' }}</td></tr>
+                    <tr><th>SKU</th><td><code class="text-muted">{{ item.sku or '-' }}</code></td></tr>
+                    <tr><th>版本</th><td>{{ item.edition or '-' }}</td></tr>
+                </table>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <table class="table table-sm info-table mb-2">
+                    <tr><th>価格</th><td>{{ '{:,}'.format(item.amount or 0) }}円</td></tr>
+                    <tr><th>税金</th><td>{{ '{:,}'.format(item.tax or 0) }}円</td></tr>
+                    <tr><th>配送料</th><td>{{ '{:,}'.format(item.shipping or 0) }}円</td></tr>
+                    <tr><th>数量</th><td>{{ item.quantity or 1 }}冊</td></tr>
+                    <tr><th>出版年度</th><td>{{ item.pub_year or '-' }}</td></tr>
+                    <tr><th>コンディション</th><td>{{ item.item_condition or '-' }}</td></tr>
+                </table>
+            </div>
+            <div class="col-md-12 col-lg-4">
+                <table class="table table-sm info-table mb-2">
+                    <tr><th>商品コード</th><td><code>{{ item.product_code_normalized or '-' }}</code></td></tr>
+                    <tr><th>注文日</th><td>{{ item.order_date or '-' }}</td></tr>
+                    <tr><th>出荷予定日</th><td>{{ item.ship_date or '-' }}</td></tr>
+                    <tr><th>受信日</th><td>{{ item.received_at or '-' }}</td></tr>
+                    <tr>
+                        <th>状態</th>
+                        <td class="status-{{ item.current_status }}">
+                            <strong>{{ order_label(item.current_status) }}</strong>
+                        </td>
+                    </tr>
+                    <tr><th>元コード</th><td><code class="text-muted">{{ item.product_code_raw or '-' }}</code></td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================= -->
+<!-- 全仕入先 在庫サマリー（最新結果一覧）     -->
+<!-- ========================================= -->
+<h5>在庫状況サマリー <span class="text-muted fw-normal" style="font-size:.8rem">（各仕入先の最新結果）</span></h5>
+{% if summary %}
+<div class="table-responsive mb-4">
+<table class="table table-bordered table-sm">
+    <thead class="table-primary">
+        <tr>
+            <th>仕入先</th>
+            <th>在庫判定</th>
+            <th>取得テキスト</th>
+            <th>最終取得日時</th>
+            <th>エラー</th>
+            <th>証跡</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for r in summary %}
+        <tr class="stock-{{ r.availability_status }}">
+            <td>{{ r.supplier_name }}</td>
+            <td class="text-center"><strong>{{ stock_label(r.availability_status) }}</strong></td>
+            <td>{{ r.raw_stock_text or '-' }}</td>
+            <td>{{ r.scraped_at }}</td>
+            <td>
+                {% if r.error_flag and r.error_message %}
+                <span class="text-danger">{{ r.error_message }}</span>
+                {% else %}
+                <span class="text-muted">-</span>
+                {% endif %}
+            </td>
+            <td class="text-center">
+                {% if r.screenshot_path %}
+                <a href="#" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#ssSummaryModal{{ loop.index }}">
+                    表示
+                </a>
+                <div class="modal fade" id="ssSummaryModal{{ loop.index }}" tabindex="-1">
+                    <div class="modal-dialog modal-xl">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h6 class="modal-title">{{ r.supplier_name }} - {{ r.scraped_at }}</h6>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body p-3">
+                                <img src="/screenshot/{{ r.screenshot_path }}" alt="screenshot"
+                                     style="width:calc(100% - 60px); margin:0 30px;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <span class="text-muted">-</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+{% else %}
+<div class="card mb-4">
+    <div class="card-body text-center text-muted py-3">
+        スクレイピング結果はまだありません
+    </div>
+</div>
+{% endif %}
+
+<!-- ========================================= -->
+<!-- 仕入先別 スクレイピング履歴               -->
+<!-- ========================================= -->
+{% if grouped_results %}
+<h5>仕入先別スクレイピング履歴</h5>
+<div class="accordion mb-4" id="scrapeHistory">
+    {% for supplier_name, results in grouped_results.items() %}
+    {% set loop_idx = loop.index %}
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed py-2" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#collapse{{ loop_idx }}">
+                <span class="me-2">{{ supplier_name }}</span>
+                <span class="badge bg-secondary me-2">{{ results|length }}件</span>
+                {% if results %}
+                {% set latest = results[0] %}
+                <span class="badge
+                    {% if latest.availability_status == 'AVAILABLE' %}bg-success
+                    {% elif latest.availability_status == 'UNAVAILABLE' %}bg-danger
+                    {% elif latest.availability_status == 'ERROR' %}bg-danger
+                    {% else %}bg-warning text-dark{% endif %}">
+                    {{ stock_label(latest.availability_status) }}
+                </span>
+                {% endif %}
+            </button>
+        </h2>
+        <div id="collapse{{ loop_idx }}" class="accordion-collapse collapse" data-bs-parent="#scrapeHistory">
+            <div class="accordion-body p-0">
+                <table class="table table-sm table-bordered mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>取得日時</th>
+                            <th>在庫判定</th>
+                            <th>取得テキスト</th>
+                            <th>エラー</th>
+                            <th>証跡</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in results %}
+                        <tr class="stock-{{ r.availability_status }}">
+                            <td>{{ r.scraped_at }}</td>
+                            <td class="text-center"><strong>{{ stock_label(r.availability_status) }}</strong></td>
+                            <td>{{ r.raw_stock_text or '-' }}</td>
+                            <td>
+                                {% if r.error_flag and r.error_message %}
+                                <span class="text-danger">{{ r.error_message }}</span>
+                                {% else %}
+                                <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if r.screenshot_path %}
+                                <a href="#" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#ssModal{{ r.id }}">
+                                    表示
+                                </a>
+                                <div class="modal fade" id="ssModal{{ r.id }}" tabindex="-1">
+                                    <div class="modal-dialog modal-xl">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h6 class="modal-title">{{ r.supplier_name }} - {{ r.scraped_at }}</h6>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body text-center p-3">
+                                                <img src="/screenshot/{{ r.screenshot_path }}" class="img-fluid" alt="screenshot">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% else %}
+                                <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,115 @@
+<!DOCTYPE html PUBLIC "-//i-mode group (ja)//DTD XHTML i-XHTML(Locale/Ver.=ja/2.0) 1.0//EN" "i-xhtml_4ja_10.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta charset="utf-8">
+<meta name="description" content="">
+<meta name="author" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="format-detection" content="telephone=no">
+<link href="/apple-touch-icon.png" rel="apple-touch-icon">
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="stylesheet" href="../assets/css/style_header.css">
+<script type="text/javascript" async="" src="https://www.googletagmanager.com/gtag/js?id=G-M5PG4DGKDR&amp;cx=c&amp;_slc=1"></script><script async="" src="//www.google-analytics.com/analytics.js"></script><script src="../assets/js/jquery-1.10.1.min.js"></script>
+<script src="../assets/js/init.js"></script>
+<script src="../js/mypage/bookSearch.js"></script>
+<!-- <link rel="stylesheet" href="../assets/css/site.min.css">
+<script src="../assets/js/site.min.js"></script> -->
+<!--[if lt IE 9]>
+<script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.2/html5shiv.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+<script type="text/javascript">
+	function trackOnClick(label) {
+				ga('send', 'event', 'BookSearch', 'Click', label, true);
+			}
+</script>    <title>書籍・雑誌検索 - 三省堂書店</title>
+    <script type="text/javascript">
+
+		function confirmTel(linkTarget) {
+			if(window.confirm('電話を発信します。よろしいですか？')) {
+				trackOnClick('StockShopList_Calling_' + linkTarget);
+				location.href = linkTarget;
+			}
+		}
+
+		$(function() {
+
+			$('#linkGoToShopList').on('click', function(){
+				trackOnClick('OpenShopListPage');
+			});
+
+			$('#linkReturnToDetail').on('click', function(){
+				trackOnClick('ReturnBookDetailFromStockShopList');
+			});
+
+		});
+	</script>
+</head>
+<body style="">
+	<!-- logo -->
+<div class="header_web">
+	<h1 id="logo_web"><a href="../booksearch/BookSearchInit.action"><img src="../assets/imgs/common/logo.png" alt="三省堂書店 BOOKS SANSEIDO"></a></h1>
+</div>
+<!-- /logo -->
+	<!-- 見出し -->
+		<section class="bg_red clearfix">
+		<div class="body clearfix">
+			<h2 class="lvl1">書籍詳細：在庫保有店舗</h2>
+		</div>
+	</section>
+	<!-- // 見出し -->
+
+	<section class="bg_white clearfix">
+		<div class="body clearfix">
+							<font color="#ff0000">在庫検索処理でエラーが発生しました。時間を置いて再度実行してください。</font><br>
+					<ul style="color: red;">
+        					</ul>
+		 </div>
+	</section>
+
+	<!-- プロモーションエリア -->
+	<section class="bg_white clearfix">
+		<div class="body clearfix">
+		 <!-- // end of foreach -->
+				
+				<div class="clearfix"></div>
+
+				<form method="get" action="/booksearch/BookSearchDetail.action" class="search_form">
+					<div id="sub_btn">
+						<!--戻るボタン-->
+												<input type="hidden" name="areaCode" value="">
+						<input type="hidden" name="shopCode" value="">
+						<input type="hidden" name="shoshiKubun" value="1">
+						<input type="hidden" name="isbn" value="9784336065706">
+						<input type="hidden" name="source" value="$source">
+						<input type="hidden" name="page" value="">
+						<input type="submit" id="linkReturnToDetail" class="btn back" value="詳細画面へ戻る">
+					</div>
+				</form>
+		</div>
+	</section>
+	<!-- // プロモーションエリア -->
+	<!-- お知らせ -->
+	<section class="home clearfix">
+		<div class="body">
+		</div>
+	</section>
+	<!-- // お知らせ -->
+		<footer>
+	<div id="footerbody">
+		<a id="pageTop" href="#wrapper" style="display: none;"><img src="../assets/imgs/common/pagetop.png" alt="ページトップへ戻る"></a>
+		<div id="footermenu">
+			<p>© SANSEIDO BOOKSTORE LTD. All rights reserved.</p>
+		</div>
+	</div>
+</footer>	<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-27940209-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+</body></html>

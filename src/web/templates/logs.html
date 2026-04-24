@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}ログ - BookAutoSystem{% endblock %}
+{% block content %}
+<h4>システムログ <span class="text-muted fw-normal" style="font-size:.85rem">（最新200件）</span></h4>
+
+<!-- デスクトップ ≥1100px: フルテーブル -->
+<div class="d-logs-table">
+<div class="table-responsive">
+<table class="table table-bordered table-sm" style="font-size:.8rem;">
+    <thead class="table-primary">
+        <tr>
+            <th style="width:155px">日時</th>
+            <th style="width:70px">レベル</th>
+            <th style="width:200px">モジュール</th>
+            <th>メッセージ</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for log in logs %}
+        <tr class="{% if log.level == 'ERROR' %}log-error{% elif log.level == 'WARNING' %}log-warning{% endif %}">
+            <td><code>{{ log.created_at }}</code></td>
+            <td class="text-center">
+                {% if log.level == 'ERROR' %}
+                <span class="badge bg-danger">ERROR</span>
+                {% elif log.level == 'WARNING' %}
+                <span class="badge bg-warning text-dark">WARN</span>
+                {% else %}
+                <span class="badge bg-secondary">{{ log.level }}</span>
+                {% endif %}
+            </td>
+            <td class="text-muted">{{ log.module }}</td>
+            <td>{{ log.message }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+</div>
+
+<!-- モバイル/タブレット <1100px: カード表示 -->
+<div class="d-logs-cards">
+    {% for log in logs %}
+    <div class="card mb-2 log-card {% if log.level == 'ERROR' %}border-danger{% elif log.level == 'WARNING' %}border-warning{% endif %}"
+         style="{% if log.level == 'ERROR' %}background:#fee2e2{% elif log.level == 'WARNING' %}background:#fef9c3{% endif %}">
+        <div class="card-body py-2 px-3">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+                {% if log.level == 'ERROR' %}
+                <span class="badge bg-danger">ERROR</span>
+                {% elif log.level == 'WARNING' %}
+                <span class="badge bg-warning text-dark">WARN</span>
+                {% else %}
+                <span class="badge bg-secondary">{{ log.level }}</span>
+                {% endif %}
+                <small class="text-muted"><code style="font-size:.75rem">{{ log.created_at }}</code></small>
+            </div>
+            <div class="text-muted mb-1" style="font-size:.7rem;">{{ log.module }}</div>
+            <div style="font-size:.8rem; word-break:break-word;">{{ log.message }}</div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

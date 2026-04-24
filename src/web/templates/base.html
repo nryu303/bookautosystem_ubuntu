@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}書店業務自動化システム{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* ── Base ── */
+        :root {
+            --bs-body-font-family: 'Yu Gothic', 'Meiryo', 'Hiragino Sans', sans-serif;
+            --bs-body-font-size: 0.875rem;
+            --color-brand: #1a56db;
+            --color-brand-dark: #143ea8;
+            --radius: 0.5rem;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,.08);
+            --shadow-md: 0 4px 12px rgba(0,0,0,.1);
+        }
+        body { background: #f4f6f9; color: #2d3748; line-height: 1.6; }
+
+        /* ── Navbar ── */
+        .navbar {
+            background: linear-gradient(135deg, var(--color-brand), var(--color-brand-dark)) !important;
+            box-shadow: var(--shadow-md);
+            padding: .6rem 1rem;
+        }
+        .navbar-brand { font-weight: 700; font-size: 1.1rem; letter-spacing: .03em; }
+        .navbar .nav-link {
+            color: rgba(255,255,255,.85) !important;
+            font-weight: 500;
+            font-size: .85rem;
+            padding: .4rem .9rem;
+            border-radius: var(--radius);
+            transition: background .15s, color .15s;
+        }
+        .navbar .nav-link:hover,
+        .navbar .nav-link.active { background: rgba(255,255,255,.15); color: #fff !important; }
+
+        /* ── Page layout ── */
+        .container-fluid { max-width: 1440px; padding: 1rem 1.5rem 2rem; }
+        h4 { font-weight: 700; color: #1e293b; margin-bottom: 1rem; font-size: 1.25rem; }
+        h5 { font-weight: 600; color: #334155; margin-bottom: .75rem; font-size: 1.05rem; }
+
+        /* ── Cards ── */
+        .card {
+            border: none;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+        }
+        .card-header {
+            border-radius: var(--radius) var(--radius) 0 0 !important;
+            font-weight: 600;
+        }
+
+        /* ── Stat cards (dashboard) ── */
+        .stat-card {
+            text-align: center;
+            padding: 1rem .5rem;
+            border-radius: var(--radius) !important;
+            background: #fff;
+            box-shadow: var(--shadow-sm);
+            font-size: .8rem;
+            color: #64748b;
+            transition: transform .15s, box-shadow .15s;
+        }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .stat-card strong { display: block; font-size: 1.5rem; margin-top: .25rem; }
+
+        /* ── Status colors ── */
+        .status-PENDING       { color: #94a3b8; }
+        .status-SELF_STOCK    { color: #16a34a; }
+        .status-HOLD          { color: #ea580c; }
+        .status-NO_STOCK      { color: #94a3b8; }
+        .status-ORDERED       { color: #2563eb; }
+        .status-ERROR         { color: #dc2626; }
+
+        /* ── Stock availability colors ── */
+        .stock-AVAILABLE      { background-color: #dcfce7 !important; }
+        .stock-UNAVAILABLE    { background-color: #fee2e2 !important; }
+        .stock-UNKNOWN        { background-color: #fef9c3 !important; }
+        .stock-ERROR          { background-color: #fee2e2 !important; }
+
+        /* ── Tables ── */
+        .table {
+            background: #fff;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 1.5rem;
+        }
+        .table th {
+            white-space: nowrap;
+            font-weight: 600;
+            font-size: .8rem;
+            text-transform: uppercase;
+            letter-spacing: .03em;
+            color: #475569;
+            border-bottom-width: 2px;
+        }
+        .table td { vertical-align: middle; font-size: .85rem; }
+        .table-primary > *,
+        .table thead.table-primary th {
+            background-color: var(--color-brand) !important;
+            color: #fff !important;
+            border-color: var(--color-brand-dark) !important;
+        }
+        .table-hover tbody tr:hover { background-color: #f0f5ff; }
+        .table-bordered > :not(caption) > * > * {
+            border-color: #e2e8f0;
+        }
+
+        /* ── Badges ── */
+        .badge {
+            font-weight: 500;
+            font-size: .75rem;
+            padding: .35em .65em;
+            border-radius: .375rem;
+        }
+
+        /* ── Buttons ── */
+        .btn { border-radius: .375rem; font-weight: 500; font-size: .8rem; }
+        .btn-primary { background: var(--color-brand); border-color: var(--color-brand); }
+        .btn-primary:hover { background: var(--color-brand-dark); border-color: var(--color-brand-dark); }
+
+        /* ── Filter buttons ── */
+        .filter-bar .btn { margin-right: .25rem; margin-bottom: .25rem; }
+
+        /* ── Forms (settings) ── */
+        .form-control-sm { border-radius: .375rem; border-color: #cbd5e1; }
+        .form-control-sm:focus {
+            border-color: var(--color-brand);
+            box-shadow: 0 0 0 .2rem rgba(26,86,219,.15);
+        }
+        .form-check-input:checked { background-color: var(--color-brand); border-color: var(--color-brand); }
+
+        /* ── Tabs ── */
+        .nav-tabs .nav-link {
+            color: #64748b;
+            font-weight: 500;
+            border-radius: var(--radius) var(--radius) 0 0;
+        }
+        .nav-tabs .nav-link.active {
+            color: var(--color-brand);
+            font-weight: 600;
+            border-bottom-color: #fff;
+        }
+
+        /* ── Log level rows ── */
+        .log-error   { background-color: #fee2e2 !important; color: #991b1b; }
+        .log-warning { background-color: #fef9c3 !important; color: #854d0e; }
+
+        /* ── Mail stats bar ── */
+        .mail-stats-bar {
+            background: #fff;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            padding: .6rem 1rem;
+            font-size: .82rem;
+        }
+
+        /* ── Detail info table ── */
+        .info-table th {
+            background: #f8fafc;
+            width: 30%;
+            font-size: .82rem;
+            color: #475569;
+        }
+        .info-table td { font-size: .85rem; }
+
+        /* ── Modal screenshot ── */
+        .modal-body img { border-radius: var(--radius); }
+
+        /* ── Footer space ── */
+        .container-fluid { padding-bottom: 3rem; }
+
+        /* ── Scrollbar (webkit) ── */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+
+        /* ── Logs: custom breakpoint at 1100px ── */
+        .d-logs-table { display: none !important; }
+        .d-logs-cards { display: block !important; }
+        @media (min-width: 1100px) {
+            .d-logs-table { display: block !important; }
+            .d-logs-cards { display: none !important; }
+        }
+
+        /* ── Tablet (768-1099px) ── */
+        @media (min-width: 768px) and (max-width: 1099.98px) {
+            .container-fluid { padding: .75rem 1rem 2rem; }
+            .stat-card { padding: .7rem .4rem; font-size: .78rem; }
+            .stat-card strong { font-size: 1.3rem; }
+            .log-card .card-body { padding: .4rem .6rem !important; }
+        }
+
+        /* ── Mobile (<768px) ── */
+        @media (max-width: 767.98px) {
+            .container-fluid { padding: .75rem .75rem 2rem; }
+            h4 { font-size: 1.1rem; }
+            .stat-card { padding: .5rem .3rem; font-size: .72rem; }
+            .stat-card strong { font-size: 1.1rem; }
+            .mail-stats-bar { font-size: .72rem; padding: .4rem .6rem; }
+            .filter-bar .btn { font-size: .7rem; padding: .2rem .45rem; }
+            .navbar-brand { font-size: .95rem; }
+            .table { font-size: .78rem; }
+        }
+
+        /* ── Supplier settings card ── */
+        .supplier-card .card-header {
+            background: #f8fafc;
+            font-size: .85rem;
+        }
+        .supplier-card .form-label {
+            font-size: .75rem;
+        }
+        .supplier-card .form-control-sm {
+            font-size: .8rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark mb-0">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">BookAutoSystem</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navMenu">
+                <div class="navbar-nav ms-auto">
+                    <a class="nav-link" href="/">処理台帳</a>
+                    <a class="nav-link" href="/suppliers">仕入台帳</a>
+                    <a class="nav-link" href="/settings">設定</a>
+                    <a class="nav-link" href="/logs">ログ</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        {% block content %}{% endblock %}
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

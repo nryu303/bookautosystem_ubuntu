@@ -1,0 +1,33 @@
+# 自動メール送信テンプレート定義
+# 差込変数: {supplier_name}, {product_name}, {product_code}, {amount}, {quantity}
+
+# 実店舗向け注文メール
+store_order:
+  subject: "【注文依頼】{product_name} ({product_code})"
+  body: |
+    {supplier_name} 御中
+
+    いつもお世話になっております。
+    下記商品の注文をお願いいたします。
+
+    商品名: {product_name}
+    商品コード: {product_code}
+    数量: {quantity}冊
+    金額: {amount}円
+
+    よろしくお願いいたします。
+
+# 複数商品まとめ注文メール（将来拡張用）
+store_bulk_order:
+  subject: "【注文依頼】{supplier_name} 宛 {quantity}点"
+  body: |
+    {supplier_name} 御中
+
+    いつもお世話になっております。
+    下記商品の注文をお願いいたします。
+
+    {items_list}
+
+    合計: {quantity}点 / {amount}円
+
+    よろしくお願いいたします。
